@@ -3,6 +3,7 @@ const app = express()
 const conn = require('./db/conn')
 
 const Task = require('./models/Task')
+const taskRouters = require('./routes/taskRouters')
 //Chamada da estrutura do banco de dados em Modelo ORM
 const User = require('./models/User')
 const userRouters = require('./routes/userRouters')
@@ -11,6 +12,7 @@ app.use(express.urlencoded({extended: true}))
 app.use(express.json())
 //Middleware de rotas de métodos controladores do modelo
 app.use('/users', userRouters)
+app.use('/tasks', taskRouters)
 
 
 /*Rotas de Exemplo
@@ -86,4 +88,4 @@ conn
 .then(() => {
     app.listen(3000)
 })
-.catch((err) => console.log())
+.catch((err) => console.log(err))

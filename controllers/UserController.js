@@ -5,10 +5,10 @@ module.exports = class UserController {
     static async createUser(req, res){
         const user = {
             email: req.body.email,
-            //método para ober uid interno. 
-            uid:(req.body.email.slice(0,5)+req.body.displayName.slice(0,3)).toUpperCase(),
-            //uid: req.body.uid, //Utilizando o firebase, por exemplo essa chave seria servida
             displayName: req.body.displayName,
+            //método para ober uid interno. 
+            uid: (req.body.email.slice(0,5) + req.body.displayName.slice(0,3)).toUpperCase(),
+            //uid: req.body.uid, //Utilizando o firebase, por exemplo essa chave seria servida
             status: true
         }
 
@@ -16,7 +16,7 @@ module.exports = class UserController {
 
         //teste caso não consiga construir user
         if(!user){
-            res.status(402).json({ message: 'user-parametros-null' }) //resposta para o programador do front, não para o usuário
+            res.status(402).json({ message: 'user-parametros-nulo' }) //resposta para o programador do front, não para o usuário
             return
         }
 
@@ -32,5 +32,57 @@ module.exports = class UserController {
         }
 
         res.status(202).json(user)
+    }
+
+    static async listUpdateUser(req, res){
+        const id = req.params.id
+
+        const user = await User.findOne({ where: {id:id} })
+
+        if(!user){
+            res.status(406).json({ message: 'parametro-usuario-inconsistente' })
+            return
+        }
+
+        res.status(200).json(user)
+    }
+
+    static async sendUpdateUser(req, res){
+        const id = req.body.id
+        
+        const user = {
+            email: req.body.email,
+            displayName: req.body.displayName,
+            uid: (req.body.email.slice(0,5) + req.body.displayName.slice(0,3)).toUpperCase(),
+            status: req.body.status
+        }
+
+        await User.update(user, { where: {id:id} })
+
+        if(!user){
+            res.status(402).json({ message: 'user-parametros-nulo' })
+            return
+        }
+
+        res.status(200).json({ message: `user-${id}-atualizado` })
+    }
+
+    static async removeUser(req, res){
+        const id = req.body.id
+
+        if(!id){
+            res.status(402).json({message:'usuario-id-parametro-nulo'})
+            return
+        }
+
+        const user = await User.findOne({ where: {id:id} })
+        if(!user){ //aqui verifica se o id, que foi preenchido, bate com a verificação de id
+            res.status(402).json({ message: `usuario-inexistente-banco` })
+            return
+        }
+
+        await User.destroy({where: {id:id}})
+
+        res.status(202).json({message:`usuario-${id}-removido`})
     }
 }

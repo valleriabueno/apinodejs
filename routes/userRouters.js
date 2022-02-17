@@ -7,5 +7,8 @@ const UserController = require('../controllers/UserController')
 
 router.post('/add', UserController.createUser)
 router.get('/', UserController.showUser)
+router.get('/edit/:id', UserController.listUpdateUser)
+router.post('/edit', UserController.sendUpdateUser)
+router.post('/remove', UserController.removeUser)
 
 module.exports = router
